@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>USDT com Spread - Binance</title>
+  <style>
+    body { font-family: Arial; text-align: center; padding: 30px; background: #f7f7f7; }
+    input[type="number"] {
+      font-size: 1em;
+      padding: 5px;
+      width: 80px;
+      text-align: center;
+    }
+    #resultado { margin-top: 20px; font-size: 1.5em; }
+  </style>
+</head>
+<body>
+
+  <h1>USDT/BRL com Spread (Binance)</h1>
+
+  <label for="spreadInput">Spread (%): </label>
+  <input type="number" id="spreadInput" value="0.80" step="0.1" min="0">
+  <div id="resultado">Carregando preço...</div>
+
+  <script>
+    async function buscarPreco() {
+      try {
+        const response = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=USDTBRL');
+        const data = await response.json();
+        const precoAtual = parseFloat(data.price);
+        const spread = parseFloat(document.getElementById('spreadInput').value);
+        const comSpread = precoAtual * (1 + spread / 100);
+        document.getElementById('resultado').innerText = 
+          `Preço com spread: R$ ${comSpread.toFixed(4)} (USDT: R$ ${precoAtual.toFixed(4)})`;
+      } catch (error) {
+        document.getElementById('resultado').innerText = 'Erro ao buscar preço';
+        console.error(error);
+      }
+    }
+
+    document.getElementById('spreadInput').addEventListener('input', buscarPreco);
+    setInterval(buscarPreco, 10000); // Atualiza a cada 10s
+    buscarPreco(); // Atualiza na carga inicial
+  </script>
+
+</body>
+</html>
