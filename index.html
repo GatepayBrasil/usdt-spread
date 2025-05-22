@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Preço USDT com Spread Dinâmico</title>
+  <style>
+    body { font-family: Arial; text-align: center; padding: 50px; background: #f7f7f7; }
+    #valor { font-size: 2em; margin-top: 20px; }
+    input[type="number"] {
+      font-size: 1em;
+      padding: 5px;
+      width: 80px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Valor do USDT com Spread</h1>
+  
+  <label for="spread">Spread (%): </label>
+  <input type="number" id="spread" value="1.5" step="0.1" min="0">
+  
+  <div id="valor">Carregando...</div>
+
+  <script>
+    const apiUrl = 'https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=brl';
+
+    async function atualizarPreco() {
+      try {
+        const spreadInput = document.getElementById('spread');
+        const spreadPercent = parseFloat(spreadInput.value);
+        const resposta = await fetch(apiUrl);
+        const dados = await resposta.json();
+        const precoAtual = dados.tether.brl;
+        const precoComSpread = precoAtual * (1 + spreadPercent / 100);
+        document.getElementById('valor').innerText = 
+          `R$ ${precoComSpread.toFixed(2)} (USDT: R$ ${precoAtual.toFixed(2)})`;
+      } catch (erro) {
+        document.getElementById('valor').innerText = 'Erro ao buscar preço';
+        console.error(erro);
+      }
+    }
+
+    setInterval(atualizarPreco, 10000); // atualiza a cada 10s
+    document.getElementById('spread').addEventListener('input', atualizarPreco);
+    atualizarPreco();
+  </script>
+</body>
+</html>
